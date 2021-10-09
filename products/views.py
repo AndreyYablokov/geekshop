@@ -19,7 +19,7 @@ def products(request):
     context = {
         'title': 'GeekShop - Каталог',
         'header': 'GeekShop',
-        'categories': ['Новинки', 'Одежда', 'Обувь', 'Аксессуары', 'Подарки'],
+        'categories': ['новинки', 'одежда', 'обувь', 'аксессуары', 'подарки'],
         'products': [
             {'image_path': '/static/vendor/img/products/Adidas-hoodie.png',
              'title': 'Худи черного цвета с монограммами adidas Originals',
