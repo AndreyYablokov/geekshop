@@ -15,7 +15,7 @@
                 <h1 class="my-4">{{ header }}</h1>
                 <div class="list-group">
                     {% for category in categories %}
-                        <a href="#" class="list-group-item">{{ category|capfirst }}</a>
+                        <a href="#" class="list-group-item">{{ category.name|capfirst }}</a>
                     {% endfor %}
                 </div>
 
@@ -57,15 +57,15 @@
                             <div class="card h-100">
                                 <a href="#">
                                     <img class="card-img-top"
-                                         src="{{ product.image_path }}"
+                                         src="{{ product.image.url }}"
                                          alt="">
                                 </a>
                                 <div class="card-body">
                                     <h4 class="card-title">
-                                        <a href="#">{{ product.title }}</a>
+                                        <a href="#">{{ product.name }}</a>
                                     </h4>
                                     <h5>{{ product.price }} руб.</h5>
-                                    <p class="card-text">{{ product.text }}</p>
+                                    <p class="card-text">{{ product.description }}</p>
                                 </div>
                                 <div class="card-footer text-center">
                                     <button type="button" class="btn btn-outline-success">Отправить в корзину</button>
