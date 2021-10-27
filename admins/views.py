@@ -1,4 +1,8 @@
-from django.shortcuts import render
+from django.shortcuts import render, HttpResponseRedirect
+from django.urls import reverse
+
+from users.models import User
+from admins.forms import UserAdminRegistrationForm, UserAdminProfileForm
 
 
 def index(request):
@@ -7,19 +11,48 @@ def index(request):
 
 
 def admin_users_create(request):
-    context = {'title': 'GeekShop - Создать пользователя'}
+    if request.method == 'POST':
+        form = UserAdminRegistrationForm(data=request.POST, files=request.FILES)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse('admins:admin_users_read'))
+    else:
+        form = UserAdminRegistrationForm
+
+    context = {
+        'title': 'GeekShop - Создать пользователя',
+        'form': form,
+    }
     return render(request, 'admins/admin-users-create.html', context)
 
 
 def admin_users_read(request):
-    context = {'title': 'GeekShop - Пользователи'}
+    context = {
+        'title': 'GeekShop - Пользователи',
+        'users': User.objects.all(),
+    }
     return render(request, 'admins/admin-users-read.html', context)
 
 
-def admin_users_update(request):
-    context = {'title': 'GeekShop - Обновление пользователя'}
+def admin_users_update(request, user_id):
+    user = User.objects.get(id=user_id)
+    if request.method == 'POST':
+        form = UserAdminProfileForm(instance=user, files=request.FILES, data=request.POST)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse('admins:admin_users_read'))
+    else:
+        form = UserAdminProfileForm(instance=user)
+
+    context = {
+        'title': 'GeekShop - Обновление пользователя',
+        'form': form,
+        'user': user,
+    }
     return render(request, 'admins/admin-users-update-delete.html', context)
 
 
-def admin_users_delete(request):
-    pass
+def admin_users_delete(request, user_id):
+    user = User.objects.get(id=user_id)
+    user.safe_delete()
+    return HttpResponseRedirect(reverse('admins:admin_users_read'))
