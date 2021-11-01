@@ -5,14 +5,22 @@ from django.contrib.auth.decorators import user_passes_test
 
 from users.models import User
 from admins.forms import UserAdminRegistrationForm, UserAdminProfileForm
+from django.views.generic.base import TemplateView
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 
 
-@user_passes_test(lambda user: user.is_staff)
-def index(request):
-    context = {'title': 'GeekShop - Админ-панель'}
-    return render(request, 'admins/index.html', context)
+class AdminTemplateView(TemplateView):
+    template_name = 'admins/index.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(AdminTemplateView, self).get_context_data(**kwargs)
+        context['title'] = 'GeekShop - Админ-панель'
+        return context
+
+    @method_decorator(user_passes_test(lambda user: user.is_staff))
+    def dispatch(self, request, *args, **kwargs):
+        return super(AdminTemplateView, self).dispatch(request, *args, **kwargs)
 
 
 class UserListView(ListView):
@@ -76,6 +84,10 @@ class UserDeleteView(DeleteView):
     def dispatch(self, request, *args, **kwargs):
         return super(UserDeleteView, self).dispatch(request, *args, **kwargs)
 
+# @user_passes_test(lambda user: user.is_staff)
+# def index(request):
+#     context = {'title': 'GeekShop - Админ-панель'}
+#     return render(request, 'admins/index.html', context)
 
 # @user_passes_test(lambda user: user.is_staff)
 # def admin_users_read(request):
