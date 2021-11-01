@@ -19,12 +19,11 @@ from django.urls import include
 from django.conf.urls.static import static
 from django.conf import settings
 
-from products.views import index
-from products.views import products
+from products.views import ProductsTemplateView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', index, name='index'),
+    path('', ProductsTemplateView.as_view(), name='index'),
     path('products/', include('products.urls', namespace='products')),
     path('users/', include('users.urls', namespace='users')),
     path('baskets/', include('baskets.urls', namespace='baskets')),
