@@ -3,8 +3,6 @@ from django.shortcuts import render
 from products.models import ProductCategory, Product
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
-# Create your views here.
-
 
 def index(request):
     context = {
