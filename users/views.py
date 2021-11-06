@@ -107,7 +107,6 @@ class UserProfileView(View):
         context = {
             'title': 'GeekShop - Профиль',
             'form': form,
-            'baskets': Basket.objects.filter(user=request.user),
         }
         return context
 
