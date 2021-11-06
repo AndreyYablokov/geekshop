@@ -116,22 +116,23 @@ class UserProfileView(View):
         return super(UserProfileView, self).dispatch(request, *args, **kwargs)
 
 
-def verify(request, email, activation_key):
-    try:
-        user = User.objects.get(email=email)
-        if user.activation_key == activation_key and not user.is_activation_key_expired():
-            user.is_active = True
-            user.save()
-            auth.login(request, user)
-            messages.success(request, 'Вы успешно зарегистрированы!')
+class UserVerifyView(View):
+    def get(self, request, email, activation_key):
+        try:
+            user = User.objects.get(email=email)
+            if user.activation_key == activation_key and not user.is_activation_key_expired():
+                user.is_active = True
+                user.save()
+                auth.login(request, user)
+                messages.success(request, 'Вы успешно зарегистрированы!')
+                return HttpResponseRedirect(reverse('index'))
+            else:
+                messages.success(request, 'Активация не пройедена: время действия ссылки истекло или неверный код '
+                                          'активации.')
+                return HttpResponseRedirect(reverse('index'))
+        except Exception as e:
+            messages.success(request, f'Ошибка при активации: {e.args}')
             return HttpResponseRedirect(reverse('index'))
-        else:
-            messages.success(request, 'Активация не пройедена: время действия ссылки истекло или неверный код '
-                                      'активации.')
-            return HttpResponseRedirect(reverse('index'))
-    except Exception as e:
-        messages.success(request, f'Ошибка при активации: {e.args}')
-        return HttpResponseRedirect(reverse('index'))
 
 # def login(request):
 #     if request.method == 'POST':
@@ -192,3 +193,20 @@ def verify(request, email, activation_key):
 #         'baskets': Basket.objects.filter(user=user),
 #     }
 #     return render(request, 'users/profile.html', context)
+
+# def verify(request, email, activation_key):
+#     try:
+#         user = User.objects.get(email=email)
+#         if user.activation_key == activation_key and not user.is_activation_key_expired():
+#             user.is_active = True
+#             user.save()
+#             auth.login(request, user)
+#             messages.success(request, 'Вы успешно зарегистрированы!')
+#             return HttpResponseRedirect(reverse('index'))
+#         else:
+#             messages.success(request, 'Активация не пройедена: время действия ссылки истекло или неверный код '
+#                                       'активации.')
+#             return HttpResponseRedirect(reverse('index'))
+#     except Exception as e:
+#         messages.success(request, f'Ошибка при активации: {e.args}')
+#         return HttpResponseRedirect(reverse('index'))
