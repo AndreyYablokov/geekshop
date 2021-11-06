@@ -10,6 +10,8 @@ from users.forms import UserLoginForm, UserRegistrationForm, UserProfileForm
 from baskets.models import Basket
 from django.views import View
 
+from users.models import User
+
 
 class UserLoginView(View):
     def get(self, request):
@@ -50,7 +52,7 @@ class UserRegistrationView(View):
             user = form.save()
             if self.send_verify_mail(user):
                 messages.success(request, 'Сообщение с ссылкой для подтвеждения почтового адреса отправлено. '
-                                          'Проверьте почту')
+                                          'Проверьте почту. Ссылка действует 48 часов')
                 return HttpResponseRedirect(reverse('users:login'))
             else:
                 messages.success(request, 'Ошибка отправки сообщения с ссылкой для подтвеждения почтового адреса. '
@@ -114,8 +116,22 @@ class UserProfileView(View):
         return super(UserProfileView, self).dispatch(request, *args, **kwargs)
 
 
-def verify(request):
-    pass
+def verify(request, email, activation_key):
+    try:
+        user = User.objects.get(email=email)
+        if user.activation_key == activation_key and not user.is_activation_key_expired():
+            user.is_active = True
+            user.save()
+            auth.login(request, user)
+            messages.success(request, 'Вы успешно зарегистрированы!')
+            return HttpResponseRedirect(reverse('index'))
+        else:
+            messages.success(request, 'Активация не пройедена: время действия ссылки истекло или неверный код '
+                                      'активации.')
+            return HttpResponseRedirect(reverse('index'))
+    except Exception as e:
+        messages.success(request, f'Ошибка при активации: {e.args}')
+        return HttpResponseRedirect(reverse('index'))
 
 # def login(request):
 #     if request.method == 'POST':
