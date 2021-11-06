@@ -1,9 +1,11 @@
+from django.core.mail import send_mail
 from django.shortcuts import render, HttpResponseRedirect
 from django.urls import reverse
 from django.contrib import auth, messages
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 
+from geekshop import settings
 from users.forms import UserLoginForm, UserRegistrationForm, UserProfileForm
 from baskets.models import Basket
 from django.views import View
@@ -45,9 +47,15 @@ class UserRegistrationView(View):
     def post(self, request):
         form = UserRegistrationForm(data=request.POST)
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Вы успешно зарегистрировались')
-            return HttpResponseRedirect(reverse('users:login'))
+            user = form.save()
+            if self.send_verify_mail(user):
+                messages.success(request, 'Сообщение с ссылкой для подтвеждения почтового адреса отправлено. '
+                                          'Проверьте почту')
+                return HttpResponseRedirect(reverse('users:login'))
+            else:
+                messages.success(request, 'Ошибка отправки сообщения с ссылкой для подтвеждения почтового адреса. '
+                                          'Попробуйте зарегистрироваться позже')
+                return HttpResponseRedirect(reverse('users:login'))
         context = self.get_context_data(form)
         return render(request, 'users/registration.html', context)
 
@@ -58,6 +66,17 @@ class UserRegistrationView(View):
             'form': form,
         }
         return context
+
+    @staticmethod
+    def send_verify_mail(user):
+        verify_link = reverse('users:verify', args=[user.email, user.activation_key])
+
+        title = f'Подтверждение учетной записи {user.username}'
+
+        message = f'Для подтверждения учетной записи {user.username} на портале \
+                    {settings.DOMAIN_NAME} перейдите по ссылке: \n{settings.DOMAIN_NAME}{verify_link}'
+
+        return send_mail(title, message, settings.EMAIL_HOST_USER, [user.email], fail_silently=False)
 
 
 class UserLogoutView(View):
@@ -94,6 +113,9 @@ class UserProfileView(View):
     def dispatch(self, request, *args, **kwargs):
         return super(UserProfileView, self).dispatch(request, *args, **kwargs)
 
+
+def verify(request):
+    pass
 
 # def login(request):
 #     if request.method == 'POST':
