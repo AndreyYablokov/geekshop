@@ -26,7 +26,7 @@ class UserLoginView(View):
             password = request.POST['password']
             user = auth.authenticate(username=username, password=password)
             if user and user.is_active:
-                auth.login(request, user)
+                auth.login(request, user, backend='django.contrib.auth.backends.ModelBackend')
                 return HttpResponseRedirect(reverse('index'))
         context = self.get_context_data(form)
         return render(request, 'users/login.html', context)
@@ -122,7 +122,7 @@ class UserVerifyView(View):
             if user.activation_key == activation_key and not user.is_activation_key_expired():
                 user.is_active = True
                 user.save()
-                auth.login(request, user)
+                auth.login(request, user, backend='django.contrib.auth.backends.ModelBackend')
                 messages.success(request, 'Вы успешно зарегистрированы!')
                 return HttpResponseRedirect(reverse('index'))
             else:
