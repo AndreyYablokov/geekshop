@@ -4,9 +4,10 @@ from django.urls import reverse
 from django.contrib import auth, messages
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
+from django.db import transaction
 
 from geekshop import settings
-from users.forms import UserLoginForm, UserRegistrationForm, UserProfileForm
+from users.forms import UserLoginForm, UserRegistrationForm, UserProfileForm, UserAdditionalProfileForm
 from baskets.models import Basket
 from django.views import View
 
@@ -89,24 +90,28 @@ class UserLogoutView(View):
 
 class UserProfileView(View):
     def get(self, request):
-        form = UserProfileForm(instance=request.user)
-        context = self.get_context_data(form, request)
+        profile_form = UserProfileForm(instance=request.user)
+        additional_profile_form = UserAdditionalProfileForm(instance=request.user.userprofile)
+        context = self.get_context_data(profile_form, additional_profile_form, request)
         return render(request, 'users/profile.html', context)
 
+    @transaction.atomic
     def post(self, request):
-        form = UserProfileForm(instance=request.user, files=request.FILES, data=request.POST)
-        if form.is_valid():
-            form.save()
+        profile_form = UserProfileForm(instance=request.user, files=request.FILES, data=request.POST)
+        additional_profile_form = UserAdditionalProfileForm(instance=request.user.userprofile, data=request.POST)
+        if profile_form.is_valid() and additional_profile_form.is_valid():
+            profile_form.save()
             messages.success(request, 'Данные успешно обновлены')
             return HttpResponseRedirect(reverse('users:profile'))
-        context = self.get_context_data(form, request)
+        context = self.get_context_data(profile_form, additional_profile_form, request)
         return render(request, 'users/profile.html', context)
 
     @staticmethod
-    def get_context_data(form, request):
+    def get_context_data(profile_form, additional_profile_form, request):
         context = {
             'title': 'GeekShop - Профиль',
-            'form': form,
+            'profile_form': profile_form,
+            'additional_profile_form': additional_profile_form,
         }
         return context
 
