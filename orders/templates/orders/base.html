@@ -46,17 +46,23 @@
         <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
             <div class="sb-sidenav-menu">
                 <div class="nav">
-                    <a class="nav-link" href="#{% url 'admins:admin_users_read' %}">
+                    <a class="nav-link" href="{% url 'products:index' %}">
                         <div class="sb-nav-link-icon">
                             <i class="fas fa-shopping-basket"></i>
                         </div>
                         Каталог
                     </a>
-                    <a class="nav-link" href="index.html">
+                    <a class="nav-link" href="{% url 'users:profile' %}">
                         <div class="sb-nav-link-icon">
                             <i class="fas fa-user"></i>
                         </div>
                         Профиль
+                    </a>
+                    <a class="nav-link" href="{% url 'orders:orders_read' %}">
+                        <div class="sb-nav-link-icon">
+                            <i class="fas fa-archive"></i>
+                        </div>
+                        Заказы
                     </a>
                 </div>
             </div>
