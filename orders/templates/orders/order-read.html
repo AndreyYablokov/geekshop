@@ -32,8 +32,8 @@
                         <h4 class="float-right">{{ object.get_total_cost }} руб.</h4>
                     </div>
                 </div>
-                <a href="#">
-                    <button class="btn btn-success btn-lg float-right">Оформить</button>
+                <a href="{% url 'orders:order_forming_complete' object.pk %}">
+                    <button class="btn btn-success btn-lg float-right">Совершить покупку</button>
                 </a>
         </div>
     </main>

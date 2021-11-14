@@ -46,7 +46,7 @@
                                         <td><a style="color: dodgerblue">{{ order.pk }}</a></td>
                                         <td>{{ order.created|date:"Y-m-d H:i:s" }}</td>
                                         <td>{{ order.updated|date:"Y-m-d H:i:s" }}</td>
-                                        <td>{{ order.get_status_display|title }}</td>
+                                        <td>{{ order.get_status_display|upper }}</td>
                                         <td>
                                            <a href="{% url 'orders:order_read' order.pk %}">
                                                Посмотреть
