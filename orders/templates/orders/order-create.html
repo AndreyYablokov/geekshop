@@ -40,7 +40,13 @@
                                                    {% endfor %}
                                                {% endif %}
                                                {{ field.errors.as_ul }}
-                                               {{ field }}
+                                               {% if field.name != 'price' %}
+                                                   {{ field }}
+                                               {% else %}
+                                                   {% if field.value %}
+                                                        {{ field.value }} руб.
+                                                   {% endif %}
+                                               {% endif %}
                                             </td>
                                         {% endfor %}
                                     </tr>
