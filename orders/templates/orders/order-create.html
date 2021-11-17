@@ -3,7 +3,8 @@
 {% block content %}
     <main>
         <h1 class="mt-4">Новый заказ</h1>
-        <form action="{% url 'orders:order_create' %}" method="post">
+        <div class="order_form">
+            <form action="{% url 'orders:order_create' %}" method="post">
             {% csrf_token %}
             {{ form.as_p }}
             <div class="card mb-4">
@@ -11,10 +12,12 @@
                     <i class="fas fa-table mr-1"></i>
                     Пользователь:
                     {% if user.first_name %}
-                    {{ user.first_name|title}}
+                    {{ user.first_name|title}}&nbsp{{ user.last_name|title}}
                     {% else %}
                     Анонимный пользователь
                     {% endif %}
+                    <br>Общее количество товаров: <span class="order_total_quantity"></span>
+                    <br>Общая стоимость товаров: <span class="order_total_cost"></span>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -31,7 +34,7 @@
                                     </thead>
                                 {% endif %}
                                 <tbody>
-                                    <tr>
+                                    <tr {% if forloop.last %} class="formset_row" {% endif %}>
                                         {% for field in form.visible_fields %}
                                             <td>
                                                {% if forloop.first %}
@@ -44,7 +47,9 @@
                                                    {{ field }}
                                                {% else %}
                                                    {% if field.value %}
-                                                        {{ field.value }} руб.
+                                                        <span class="orderitems-{{forloop.parentloop.counter0}}-price">
+                                                            {{ field.value }}
+                                                        </span> руб
                                                    {% endif %}
                                                {% endif %}
                                             </td>
@@ -62,5 +67,6 @@
                 </div>
             </div>
         </form>
+        </div>
     </main>
 {% endblock %}
