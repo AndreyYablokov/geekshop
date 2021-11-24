@@ -34,7 +34,7 @@
                                     </thead>
                                 {% endif %}
                                 <tbody>
-                                    <tr {% if forloop.last %} class="formset_row" {% endif %}>
+                                    <tr class="formset_row">
                                         {% for field in form.visible_fields %}
                                             <td>
                                                {% if forloop.first %}

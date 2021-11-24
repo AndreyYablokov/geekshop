@@ -21,3 +21,7 @@ class Product(models.Model):
 
     def __str__(self):
         return f'{self.name} | {self.category.name}'
+
+    @staticmethod
+    def get_items():
+        return Product.objects.filter(quantity__gte=1).order_by('category', 'name')

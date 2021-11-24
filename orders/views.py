@@ -1,6 +1,6 @@
 from django.db import transaction
 from django.forms import inlineformset_factory
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy, reverse
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
@@ -10,6 +10,7 @@ from django.db.models.signals import pre_save, pre_delete
 from orders.models import Order, OrderItem
 from orders.forms import OrderItemForm
 from baskets.models import Basket
+from products.models import Product
 
 
 class OrdersListView(ListView):
@@ -119,6 +120,15 @@ def order_forming_complete(request, pk):
     order.save()
 
     return HttpResponseRedirect(reverse('orders:orders_read'))
+
+
+def get_product_price(request, pk):
+    if request.is_ajax():
+        product = Product.objects.filter(pk=int(pk)).first()
+        if product:
+            return JsonResponse({'price': product.price})
+        else:
+            return JsonResponse({'price': 0})
 
 
 @receiver(pre_save, sender=OrderItem)
