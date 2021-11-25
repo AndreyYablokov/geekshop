@@ -1,0 +1,40 @@
+{% extends 'orders/base.html' %}
+
+{% block content %}
+    <main>
+        <div class="basket_list">
+            <h4 class="mt-3 mb-3 d-flex justify-content-between align-items-center mb-3">
+                &nbsp&nbsp&nbsp Заказ №{{ object.pk }} от {{ object.created|date:"Y-m-d H:i:s" }}
+                <span class="badge badge-secondary badge-pill">{{ object.get_total_quantity }}</span>
+            </h4>
+                {% for item in object.orderitems.select_related %}
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ item.product.name }}</h5>
+                            <p class="card-text">{{ item.product.description }}</p>
+                        </div>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item bg-light">
+                                <div class="row text-center">
+                                    <div class="col-lg-4">
+                                        <input name="{{ item.id }}" type="number" class="form-control"
+                                               value="{{ item.quantity }}" min="0" readonly="True">
+                                    </div>
+                                    <div class="col-lg-4">{{ item.get_product_cost }} руб. </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                {% endfor %}
+                <div class="card mb-3">
+                    <div class="card-footer">
+                        <p class="float-left">Итого</p>
+                        <h4 class="float-right">{{ object.get_total_cost }} руб.</h4>
+                    </div>
+                </div>
+                <a href="{% url 'orders:order_forming_complete' object.pk %}">
+                    <button class="btn btn-success btn-lg float-right">Совершить покупку</button>
+                </a>
+        </div>
+    </main>
+{% endblock %}

@@ -1,0 +1,85 @@
+{% extends 'orders/base.html' %}
+
+{% block content %}
+    <main>
+        <div class="container-fluid">
+            <h1 class="mt-4">Заказы</h1>
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-table mr-1"></i>
+                    Пользователь:
+                    {% if user.first_name %}
+                        {{ user.first_name|title}}&nbsp{{ user.last_name|title}}
+                    {% else %}
+                        Анонимный пользователь
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                            <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Создан</th>
+                                <th>Обновлен</th>
+                                <th>Статус</th>
+                                <th>Просмотр</th>
+                                <th>Редактирование</th>
+                                <th>Удаление</th>
+                            </tr>
+                            </thead>
+                            <tfoot>
+                            <tr>
+                                <th>ID</th>
+                                <th>Создан</th>
+                                <th>Обновлен</th>
+                                <th>Статус</th>
+                                <th>Просмотр</th>
+                                <th>Редактирование</th>
+                                <th>Удаление</th>
+                            </tr>
+                            </tfoot>
+                            <tbody>
+                            {% for order in object_list %}
+                                {% if order.is_active %}
+                                    <tr>
+                                        <td><a style="color: dodgerblue">{{ order.pk }}</a></td>
+                                        <td>{{ order.created|date:"Y-m-d H:i:s" }}</td>
+                                        <td>{{ order.updated|date:"Y-m-d H:i:s" }}</td>
+                                        <td>{{ order.get_status_display|upper }}</td>
+                                        <td>
+                                           <a href="{% url 'orders:order_read' order.pk %}">
+                                               Посмотреть
+                                           </a>
+                                       </td>
+                                        <td>
+                                           {% if order.status == 'FM' %}
+                                             <a href="{% url 'orders:order_update' order.pk %}">
+                                               Редактировать
+                                             </a>
+                                           {% endif %}
+                                       </td>
+                                       <td>
+                                           {% if order.status == 'FM' %}
+                                             <a href="{% url 'orders:order_delete' order.pk %}">
+                                                 Удалить
+                                             </a>
+                                           {% endif %}
+                                       </td>
+                                    </tr>
+                                {% endif %}
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a href="{% url 'orders:order_create' %}">
+                        <button class="btn btn-success">Новый заказ</button>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+{% endblock %}

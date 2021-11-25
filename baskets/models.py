@@ -26,3 +26,6 @@ class Basket(models.Model):
     def total_quantity(self):
         return sum(basket.quantity for basket in self.baskets)
 
+    @staticmethod
+    def get_item(pk):
+        return Basket.objects.filter(pk=pk).first()
