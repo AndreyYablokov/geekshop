@@ -84,8 +84,10 @@ class UserProfileForm(UserChangeForm):
 
 
 class UserAdditionalProfileForm(forms.ModelForm):
-    tagline = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control py-4'}), required=False)
+    tagline = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}), required=False)
     user_info = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control py-4'}), required=False)
+    gender = forms.ChoiceField(widget=forms.Select(attrs={'class': 'custom-select'}),
+                               choices=UserProfile.GENDER_CHOICES, required=False)
 
     class Meta:
         model = UserProfile

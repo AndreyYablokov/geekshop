@@ -12,6 +12,9 @@ from orders.forms import OrderItemForm
 from baskets.models import Basket
 from products.models import Product
 
+from django.utils.decorators import method_decorator
+from django.contrib.auth.decorators import login_required
+
 
 class OrdersListView(ListView):
     model = Order
@@ -19,6 +22,10 @@ class OrdersListView(ListView):
 
     def get_queryset(self):
         return Order.objects.filter(user=self.request.user)
+
+    @method_decorator(login_required())
+    def dispatch(self, *args, **kwargs):
+        return super(ListView, self).dispatch(*args, **kwargs)
 
 
 class OrderCreateView(CreateView):
@@ -65,6 +72,10 @@ class OrderCreateView(CreateView):
 
         return super(OrderCreateView, self).form_valid(form)
 
+    @method_decorator(login_required())
+    def dispatch(self, *args, **kwargs):
+        return super(CreateView, self).dispatch(*args, **kwargs)
+
 
 class OrderUpdateView(UpdateView):
     model = Order
@@ -78,7 +89,8 @@ class OrderUpdateView(UpdateView):
         if self.request.POST:
             context['orderitems'] = OrderFormSet(self.request.POST, instance=self.object)
         else:
-            formset = OrderFormSet(instance=self.object)
+            queryset = self.object.orderitems.select_related()
+            formset = OrderFormSet(instance=self.object, queryset=queryset)
             for form in formset.forms:
                 if form.instance.pk:
                     form.initial['price'] = form.instance.product.price
@@ -101,17 +113,38 @@ class OrderUpdateView(UpdateView):
 
         return super(OrderUpdateView, self).form_valid(form)
 
+    @method_decorator(login_required())
+    def dispatch(self, *args, **kwargs):
+        if self.request.user.id == Order.objects.filter(pk=kwargs['pk']).first().user_id:
+            return super(UpdateView, self).dispatch(*args, **kwargs)
+        else:
+            return HttpResponseRedirect(reverse('orders:orders_read'))
+
 
 class OrderDeleteView(DeleteView):
     model = Order
     success_url = reverse_lazy('orders:orders_read')
     template_name = 'orders/order-delete.html'
 
+    @method_decorator(login_required())
+    def dispatch(self, *args, **kwargs):
+        if self.request.user.id == Order.objects.filter(pk=kwargs['pk']).first().user_id:
+            return super(DeleteView, self).dispatch(*args, **kwargs)
+        else:
+            return HttpResponseRedirect(reverse('orders:orders_read'))
+
 
 class OrderDetailView(DetailView):
     model = Order
     extra_context = {'title': 'Просмотр заказа'}
     template_name = 'orders/order-read.html'
+
+    @method_decorator(login_required())
+    def dispatch(self, *args, **kwargs):
+        if self.request.user.id == Order.objects.filter(pk=kwargs['pk']).first().user_id:
+            return super(DetailView, self).dispatch(*args, **kwargs)
+        else:
+            return HttpResponseRedirect(reverse('orders:orders_read'))
 
 
 def order_forming_complete(request, pk):
