@@ -115,7 +115,10 @@ class OrderUpdateView(UpdateView):
 
     @method_decorator(login_required())
     def dispatch(self, *args, **kwargs):
-        return super(UpdateView, self).dispatch(*args, **kwargs)
+        if self.request.user.id == Order.objects.filter(pk=kwargs['pk']).first().user_id:
+            return super(UpdateView, self).dispatch(*args, **kwargs)
+        else:
+            return HttpResponseRedirect(reverse('orders:orders_read'))
 
 
 class OrderDeleteView(DeleteView):
@@ -125,7 +128,10 @@ class OrderDeleteView(DeleteView):
 
     @method_decorator(login_required())
     def dispatch(self, *args, **kwargs):
-        return super(DeleteView, self).dispatch(*args, **kwargs)
+        if self.request.user.id == Order.objects.filter(pk=kwargs['pk']).first().user_id:
+            return super(DeleteView, self).dispatch(*args, **kwargs)
+        else:
+            return HttpResponseRedirect(reverse('orders:orders_read'))
 
 
 class OrderDetailView(DetailView):
@@ -135,7 +141,10 @@ class OrderDetailView(DetailView):
 
     @method_decorator(login_required())
     def dispatch(self, *args, **kwargs):
-        return super(DetailView, self).dispatch(*args, **kwargs)
+        if self.request.user.id == Order.objects.filter(pk=kwargs['pk']).first().user_id:
+            return super(DetailView, self).dispatch(*args, **kwargs)
+        else:
+            return HttpResponseRedirect(reverse('orders:orders_read'))
 
 
 def order_forming_complete(request, pk):
